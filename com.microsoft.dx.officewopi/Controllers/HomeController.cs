@@ -13,17 +13,15 @@ using System.Web.Mvc;
 
 namespace com.microsoft.dx.officewopi.Controllers
 {
-    [Authorize]
     public class HomeController : Controller
     {
         /// <summary>
         /// Index view displays all files for the signed in user
         /// </summary>
-        [Authorize]
         public async Task<ActionResult> Index()
         {
             // Get files for the user
-            var files = DocumentDBRepository<DetailedFileModel>.GetItems("Files", i => i.OwnerId == User.Identity.Name.ToLower()).ToList();
+            var files = DocumentRepository<DetailedFileModel>.GetItems("Files", i => true).ToList();
 
             // Populate valid actions for each of the files
             await files.PopulateActions();
@@ -35,7 +33,6 @@ namespace com.microsoft.dx.officewopi.Controllers
         /// <summary>
         /// Detail view hosts the WOPI host frame and loads the appropriate action view from Office Online
         /// </summary>
-        [Authorize]
         [Route("Home/Detail/{id}")]
         public async Task<ActionResult> Detail(Guid id)
         {
@@ -44,8 +41,8 @@ namespace com.microsoft.dx.officewopi.Controllers
                 return RedirectToAction("Error", "Home", new { error = "No action provided" });
 
             // Get the specific file from DocumentDB
-            var file = DocumentDBRepository<FileModel>.GetItem("Files",
-                i => i.OwnerId == User.Identity.Name.ToLower() && i.id == id);
+            var file = DocumentRepository<FileModel>.GetItem("Files",
+                i => true);
 
             // Check for null file
             if (file == null)
@@ -62,10 +59,15 @@ namespace com.microsoft.dx.officewopi.Controllers
                 string urlsrc = WopiUtil.GetActionUrl(action, file, Request.Url.Authority);
 
                 // Generate JWT token for the user/document
-                WopiSecurity wopiSecurity = new WopiSecurity();
-                var token = wopiSecurity.GenerateToken(User.Identity.Name.ToLower(), getUserContainer(), id.ToString());
-                ViewData["access_token"] = wopiSecurity.WriteToken(token);
-                ViewData["access_token_ttl"] = token.ValidTo.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds;
+                /*
+                                WopiSecurity wopiSecurity = new WopiSecurity();
+                                var token = wopiSecurity.GenerateToken(User.Identity.Name.ToLower(), getUserContainer(), id.ToString());
+                                ViewData["access_token"] = wopiSecurity.WriteToken(token);
+                                ViewData["access_token_ttl"] = token.ValidTo.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds;
+                */
+
+                ViewData["access_token"] = "MY-VERY-SUPER-SECRET-TOKEN";
+                ViewData["access_token_ttl"] = 1529837761073;
                 ViewData["wopi_urlsrc"] = urlsrc;
                 return View();
             }
@@ -80,7 +82,6 @@ namespace com.microsoft.dx.officewopi.Controllers
         /// Adds the submitted files for Azure Blob Storage and metadata into DocumentDB
         /// </summary>
         [HttpPost]
-        [Authorize]
         public async Task<ActionResult> Add()
         {
             try
@@ -106,7 +107,7 @@ namespace com.microsoft.dx.officewopi.Controllers
                 var id = await Utils.AzureStorageUtil.UploadFile(file.id.ToString(), file.Container, bytes);
 
                 // Write the details into documentDB
-                await DocumentDBRepository<FileModel>.CreateItemAsync("Files", (FileModel)file);
+                await DocumentRepository<FileModel>.CreateItemAsync("Files", (FileModel)file);
 
                 // Return json representation of information
                 return Json(new { success = true, file = file });
@@ -122,17 +123,16 @@ namespace com.microsoft.dx.officewopi.Controllers
         /// Deletes the file from Azure Blob Storage and metadata into DocumentDB
         /// </summary>
         [HttpDelete]
-        [Authorize]
         [Route("Home/Delete/{id}")]
         public async Task<ActionResult> Delete(Guid id)
         {
             try
             {
                 // Get the file from DocumentDB
-                var file = DocumentDBRepository<FileModel>.GetItem("Files", i => i.id == id);
+                var file = DocumentRepository<FileModel>.GetItem("Files", i => i.id == id);
 
                 // Delete the record from DocumentDB
-                await DocumentDBRepository<FileModel>.DeleteItemAsync("Files", file.id.ToString(), file);
+                await DocumentRepository<FileModel>.DeleteItemAsync("Files", file.id.ToString(), file);
 
                 // Delete the blob
                 await Utils.AzureStorageUtil.DeleteFile(file.id.ToString(), file.Container);

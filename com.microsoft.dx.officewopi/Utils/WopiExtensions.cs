@@ -33,7 +33,7 @@ namespace com.microsoft.dx.officewopi.Utils
             {
                 // Lookup the file in the database
                 var itemId = new Guid(request.Id);
-                var file = DocumentDBRepository<DetailedFileModel>.GetItem("Files", i => i.id == itemId);
+                var file = DocumentRepository<DetailedFileModel>.GetItem("Files", i => i.id == itemId);
                 
                 // Check for null file
                 if (file == null)
@@ -169,7 +169,7 @@ namespace com.microsoft.dx.officewopi.Utils
                 // Update the file with a LockValue and LockExpiration
                 file.LockValue = requestLock;
                 file.LockExpires = DateTime.Now.AddMinutes(30);
-                await DocumentDBRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
+                await DocumentRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
 
                 // Return success 200
                 return returnStatus(HttpStatusCode.OK, "Success");
@@ -178,7 +178,7 @@ namespace com.microsoft.dx.officewopi.Utils
             {
                 // File lock matches existing lock, so refresh lock by extending expiration
                 file.LockExpires = DateTime.Now.AddMinutes(30);
-                await DocumentDBRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
+                await DocumentRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
 
                 // Return success 200
                 HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
@@ -213,7 +213,7 @@ namespace com.microsoft.dx.officewopi.Utils
                 // File lock expired, so clear it out
                 file.LockValue = null;
                 file.LockExpires = null;
-                await DocumentDBRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
+                await DocumentRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
 
                 // File is not locked...return empty X-WOPI-Lock header
                 context.Response.Headers[WopiResponseHeaders.LOCK] = String.Empty;
@@ -253,7 +253,7 @@ namespace com.microsoft.dx.officewopi.Utils
                 // File lock expired, so clear it out
                 file.LockValue = null;
                 file.LockExpires = null;
-                await DocumentDBRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
+                await DocumentRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
 
                 // File isn't locked...pass empty Lock in mismatch response
                 return context.returnLockMismatch(String.Empty, "File isn't locked");
@@ -267,7 +267,7 @@ namespace com.microsoft.dx.officewopi.Utils
             {
                 // Extend the expiration
                 file.LockExpires = DateTime.Now.AddMinutes(30);
-                await DocumentDBRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
+                await DocumentRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
 
                 // Return success 200
                 return returnStatus(HttpStatusCode.OK, "Success");
@@ -296,7 +296,7 @@ namespace com.microsoft.dx.officewopi.Utils
                 // File lock expired, so clear it out
                 file.LockValue = null;
                 file.LockExpires = null;
-                await DocumentDBRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
+                await DocumentRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
 
                 // File isn't locked...pass empty Lock in mismatch response
                 return context.returnLockMismatch(String.Empty, "File isn't locked");
@@ -311,7 +311,7 @@ namespace com.microsoft.dx.officewopi.Utils
                 // Unlock the file
                 file.LockValue = null;
                 file.LockExpires = null;
-                await DocumentDBRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
+                await DocumentRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
 
                 // Return success 200
                 return returnStatus(HttpStatusCode.OK, "Success");
@@ -341,7 +341,7 @@ namespace com.microsoft.dx.officewopi.Utils
                 // File lock expired, so clear it out
                 file.LockValue = null;
                 file.LockExpires = null;
-                await DocumentDBRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
+                await DocumentRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
 
                 // File isn't locked...pass empty Lock in mismatch response
                 return context.returnLockMismatch(String.Empty, "File isn't locked");
@@ -356,7 +356,7 @@ namespace com.microsoft.dx.officewopi.Utils
                 // Update the file with a LockValue and LockExpiration
                 file.LockValue = requestLock;
                 file.LockExpires = DateTime.Now.AddMinutes(30);
-                await DocumentDBRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
+                await DocumentRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
 
                 // Return success 200
                 return returnStatus(HttpStatusCode.OK, "Success");
@@ -388,7 +388,7 @@ namespace com.microsoft.dx.officewopi.Utils
 
                     // Update version
                     file.Version++;
-                    await DocumentDBRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
+                    await DocumentRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
 
                     // Return success 200
                     return returnStatus(HttpStatusCode.OK, "Success");
@@ -404,7 +404,7 @@ namespace com.microsoft.dx.officewopi.Utils
                 // File lock expired, so clear it out
                 file.LockValue = null;
                 file.LockExpires = null;
-                await DocumentDBRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
+                await DocumentRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
 
                 // File isn't locked...pass empty Lock in mismatch response
                 return context.returnLockMismatch(String.Empty, "File isn't locked");
@@ -424,7 +424,7 @@ namespace com.microsoft.dx.officewopi.Utils
 
                 // Update version
                 file.Version++;
-                await DocumentDBRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
+                await DocumentRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
 
                 // Return success 200
                 return returnStatus(HttpStatusCode.OK, "Success");
@@ -481,7 +481,7 @@ namespace com.microsoft.dx.officewopi.Utils
                 var id = await Utils.AzureStorageUtil.UploadFile(newFile.id.ToString(), newFile.Container, bytes);
 
                 // Write the details into documentDB
-                await DocumentDBRepository<FileModel>.CreateItemAsync("Files", (FileModel)newFile);
+                await DocumentRepository<FileModel>.CreateItemAsync("Files", (FileModel)newFile);
 
                 // Get access token for the new file
                 WopiSecurity security = new WopiSecurity();
@@ -539,7 +539,7 @@ namespace com.microsoft.dx.officewopi.Utils
                     file.LockValue = requestLock;
                     file.LockExpires = DateTime.Now.AddMinutes(30);
                     file.BaseFileName = newFileName;
-                    await DocumentDBRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
+                    await DocumentRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
 
                     // Return success 200
                     return returnStatus(HttpStatusCode.OK, "Success");
@@ -549,7 +549,7 @@ namespace com.microsoft.dx.officewopi.Utils
                     // File lock matches existing lock, so we can change the name
                     file.LockExpires = DateTime.Now.AddMinutes(30);
                     file.BaseFileName = newFileName;
-                    await DocumentDBRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
+                    await DocumentRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
 
                     // Return success 200
                     HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
@@ -583,7 +583,7 @@ namespace com.microsoft.dx.officewopi.Utils
             file.UserInfo = System.Text.Encoding.UTF8.GetString(bytes);
 
             // Update the file in DocumentDB
-            await DocumentDBRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
+            await DocumentRepository<FileModel>.UpdateItemAsync("Files", file.id.ToString(), (FileModel)file);
 
             // Return success
             return returnStatus(HttpStatusCode.OK, "Success");

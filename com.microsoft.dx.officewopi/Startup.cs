@@ -9,7 +9,7 @@ namespace com.microsoft.dx.officewopi
     {
         public void Configuration(IAppBuilder app)
         {
-            ConfigureAuth(app);
+            //ConfigureAuth(app);
         }
     }
 }

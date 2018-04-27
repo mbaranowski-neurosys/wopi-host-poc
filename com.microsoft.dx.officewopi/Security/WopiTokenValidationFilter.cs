@@ -36,7 +36,7 @@ namespace com.microsoft.dx.officewopi.Security
                 
                 // Get the requested file from Document DB
                 var itemId = new Guid(requestData.Id);
-                var file = DocumentDBRepository<DetailedFileModel>.GetItem("Files", i => i.id == itemId);
+                var file = DocumentRepository<DetailedFileModel>.GetItem("Files", i => i.id == itemId);
 
                 // Check for missing file
                 if (file == null)

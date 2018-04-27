@@ -26,6 +26,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <WebProject_DirectoryAccessLevelKey>0</WebProject_DirectoryAccessLevelKey>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -226,7 +227,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utils\AzureStorageUtil.cs" />
-    <Compile Include="Utils\DocumentDBRepository.cs" />
+    <Compile Include="Utils\DocumentRepository.cs" />
     <Compile Include="Utils\SettingsHelper.cs" />
     <Compile Include="Utils\WopiUtil.cs" />
   </ItemGroup>
@@ -239,9 +240,6 @@
     <Content Include="Content\Site.css" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="OfficeWopi.pfx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <None Include="Properties\PublishProfiles\officewopi - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\officewopi - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />

@@ -16,7 +16,7 @@ namespace com.microsoft.dx.officewopi.Utils
             get { return ConfigurationManager.AppSettings["ida:ClientSecret"]; }
         }
 
-        public static string AuthorizationUri = "https://login.microsoftonline.com";
+        public static string AuthorizationUri = "https://miba.auth0.com";
         public static string Authority = String.Format("{0}/common", AuthorizationUri);
         public static string AADGraphResourceId = "https://graph.windows.net";
         public static string MicrosoftGraphResourceId = "https://graph.microsoft.com";

@@ -11,7 +11,7 @@ using System.Linq.Expressions;
 
 namespace com.microsoft.dx.officewopi.Utils
 {
-    public static class DocumentDBRepository<T>
+    public static class DocumentRepository<T>
     {
        private static string databaseId;
        private static String DatabaseId
